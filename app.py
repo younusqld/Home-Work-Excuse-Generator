@@ -21,7 +21,7 @@ def generate_excuse():
 
         # Generate prompt based on language
         if lang == "ml":
-            prompt = f" എന്റെ കാര്യം ചെയ്യാത്തതിന് മലയാളത്തിൽ മാത്രം ഒരു ചെറിയ തമാശയുള്ള ഒഴികഴിവ് തരൂ {reason} "
+            prompt = f"{reason} ചെയ്യാത്തതിന് മലയാളത്തിൽ മാത്രം ഒരു ചെറിയ തമാശയുള്ള ഒഴികഴിവ് തരൂ "
 
         response = model.generate_content(prompt)
         excuse = response.text.strip()
