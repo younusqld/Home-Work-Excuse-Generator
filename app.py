@@ -1,34 +1,31 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from openai import OpenAI
-import os
+import google.generativeai as genai
 
 app = Flask(__name__)
-CORS(app)  # Allow frontend to access this API
+CORS(app)  # allow requests from any origin
 
-# Set your API key (better from environment variable)
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY", "YOUR_OPENAI_API_KEY"))
+genai.configure(api_key="AIzaSyC0sUgnFwvIas3TEsOc9JPdC2InKYDXncY")
+model = genai.GenerativeModel("gemini-1.5-flash")
 
-@app.route("/generate-excuse", methods=["GET"])
+@app.route("/generate-excuse", methods=["GET", "POST"])
 def generate_excuse():
-    lang = request.args.get("lang", "en")
-    
-    prompt = (
-        "Give me a funny excuse in Malayalam for not doing homework"
-        if lang == "ml"
-        else "Give me a funny excuse in English for not doing homework"
-    )
-    
     try:
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "user", "content": prompt}
-            ]
-        )
-        excuse = response.choices[0].message.content.strip()
-        return jsonify({"excuse": excuse})
-    
+        if request.method == "POST":
+            data = request.get_json()
+            reason = data.get("reason", "homework") if data else "homework"
+            lang = data.get("lang", "ml") if data else "ml"
+        else:
+            reason = request.args.get("reason", "homework")
+            lang = request.args.get("lang", "ml")
+
+        # Generate prompt based on language
+        if lang == "ml":
+            prompt = f" എന്റെ കാര്യം ചെയ്യാത്തതിന് മലയാളത്തിൽ മാത്രം ഒരു ചെറിയ തമാശയുള്ള ഒഴികഴിവ് തരൂ {reason} "
+
+        response = model.generate_content(prompt)
+        excuse = response.text.strip()
+        return jsonify({"excuse": excuse}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
