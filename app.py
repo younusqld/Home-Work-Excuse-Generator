@@ -5,7 +5,7 @@ import google.generativeai as genai
 app = Flask(__name__)
 CORS(app)  # allow requests from any origin
 
-genai.configure(api_key="AIzaSyC0sUgnFwvIas3TEsOc9JPdC2InKYDXncY")
+genai.configure(api_key="api key")
 model = genai.GenerativeModel("gemini-1.5-flash")
 
 @app.route("/generate-excuse", methods=["GET", "POST"])
